@@ -39,11 +39,9 @@ This project was built entirely from scratch without the use of heavy frameworks
 
 ## 📸 Screenshots
 
-*(Replace the placeholder links below with actual screenshots of your project)*
-
 | Array Visualization (Sorting/Searching) | Graph Traversal (BFS/DFS) |
 | :---: | :---: |
-| <img src="https://via.placeholder.com/500x280.png?text=Array+Visualization+Screenshot" alt="Sorting View" width="100%"> | <img src="https://via.placeholder.com/500x280.png?text=Graph+Visualization+Screenshot" alt="Graph View" width="100%"> |
+| <img src="screenshots/sorting.png" alt="Sorting View" width="100%"> | <img src="screenshots/graph.png" alt="Graph View" width="100%"> |
 
 ## 📂 Folder Structure
 
@@ -72,7 +70,7 @@ Because this project is built with Vanilla Web Technologies, no build tools or p
 
 1. **Clone the repository:**
 ```bash
-git clone [https://github.com/raunak18904/Interactive-Algorithm-Visualizer.git](https://github.com/raunak18904/Interactive-Algorithm-Visualizer.git)
+git clone https://github.com/raunak18904/Interactive-Algorithm-Visualizer.git
 
 ```
 
