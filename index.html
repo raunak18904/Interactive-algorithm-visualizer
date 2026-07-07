@@ -11,7 +11,11 @@
 </head>
 <body>
 
-  <!-- ============ NAVBAR ============ -->
+  <div id="globalLoader" class="global-loader">
+    <div class="loader-spinner"></div>
+    <p>INITIALIZING VISUALIZER...</p>
+  </div>
+
   <header class="navbar">
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle algorithm menu">
       <span></span><span></span><span></span>
@@ -33,7 +37,6 @@
 
   <div class="app-shell">
 
-    <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar" id="sidebar">
       <nav class="algo-nav">
 
@@ -82,10 +85,8 @@
 
     <div class="sidebar-scrim" id="sidebarScrim"></div>
 
-    <!-- ============ MAIN CONTENT ============ -->
     <main class="main-content">
 
-      <!-- Controls -->
       <section class="controls-bar" aria-label="Visualization controls">
         <div class="controls-left">
           <button class="btn btn-secondary" id="generateBtn">
@@ -111,7 +112,6 @@
         </div>
       </section>
 
-      <!-- Visualization area -->
       <section class="visual-stage" aria-label="Visualization canvas">
         <div class="stage-grid"></div>
         <div class="stage-header">
@@ -119,8 +119,7 @@
           <span class="stage-hint" id="stageHint">Array of 30 elements &middot; unsorted</span>
         </div>
         <div class="visual-canvas" id="visualCanvas">
-          <!-- bars / nodes injected by script.js -->
-        </div>
+          </div>
         <div class="stage-legend" id="stageLegend">
           <span><i class="dot dot-default"></i>Default</span>
           <span><i class="dot dot-compare"></i>Comparing</span>
@@ -128,7 +127,6 @@
         </div>
       </section>
 
-      <!-- Info panel -->
       <section class="info-panel" aria-label="Algorithm information">
         <div class="info-card info-description">
           <h2>Algorithm Description</h2>
@@ -161,6 +159,10 @@
           </div>
         </div>
       </section>
+      
+      <footer class="app-footer">
+        <p>Interactive Algorithm Visualizer &middot; Built for Logic & Learning</p>
+      </footer>
 
     </main>
   </div>
@@ -175,5 +177,13 @@
 
   <script src="algorithms/bfs.js"></script>
   <script src="algorithms/dfs.js"></script>
+
+  <script>
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('globalLoader');
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 600);
+    });
+  </script>
 </body>
 </html>
