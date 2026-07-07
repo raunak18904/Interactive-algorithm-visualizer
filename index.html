@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Algorithm Visualizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="navbar">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle algorithm menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="brand">
+      <span class="brand-mark">&lt;/&gt;</span>
+      <div class="brand-text">
+        <h1>Interactive Algorithm Visualizer</h1>
+        <p>Sorting &middot; Searching &middot; Graph Traversal</p>
+      </div>
+    </div>
+
+    <div class="navbar-status">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusLabel">Idle</span>
+    </div>
+  </header>
+
+  <div class="app-shell">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="algo-nav">
+
+        <div class="algo-group">
+          <p class="algo-group-label">Sorting</p>
+          <button class="algo-btn active" data-algo="bubble-sort">
+            <span class="algo-index">01</span>
+            <span class="algo-name">Bubble Sort</span>
+          </button>
+          <button class="algo-btn" data-algo="merge-sort">
+            <span class="algo-index">02</span>
+            <span class="algo-name">Merge Sort</span>
+          </button>
+        </div>
+
+        <div class="algo-group">
+          <p class="algo-group-label">Searching</p>
+          <button class="algo-btn" data-algo="linear-search">
+            <span class="algo-index">03</span>
+            <span class="algo-name">Linear Search</span>
+          </button>
+          <button class="algo-btn" data-algo="binary-search">
+            <span class="algo-index">04</span>
+            <span class="algo-name">Binary Search</span>
+          </button>
+        </div>
+
+        <div class="algo-group">
+          <p class="algo-group-label">Graph Traversal</p>
+          <button class="algo-btn" data-algo="bfs">
+            <span class="algo-index">05</span>
+            <span class="algo-name">Breadth-First Search</span>
+          </button>
+          <button class="algo-btn" data-algo="dfs">
+            <span class="algo-index">06</span>
+            <span class="algo-name">Depth-First Search</span>
+          </button>
+        </div>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <p>Select an algorithm, generate a dataset, then run the visualization.</p>
+      </div>
+    </aside>
+
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="main-content">
+
+      <!-- Controls -->
+      <section class="controls-bar" aria-label="Visualization controls">
+        <div class="controls-left">
+          <button class="btn btn-secondary" id="generateBtn">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M4 12h4l2-7 4 14 2-7h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Generate Random
+          </button>
+          <button class="btn btn-primary" id="startBtn">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M6 4l14 8-14 8V4z" fill="currentColor"/></svg>
+            Start Visualization
+          </button>
+          <button class="btn btn-ghost" id="resetBtn">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M4 4v6h6M20 20v-6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 15a8 8 0 0014.5 3.5M19.5 9A8 8 0 005 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Reset
+          </button>
+        </div>
+
+        <div class="controls-right">
+          <label class="speed-control" for="speedSlider">
+            <span class="speed-label">Speed</span>
+            <input type="range" id="speedSlider" min="1" max="10" value="5" step="1" />
+            <span class="speed-value" id="speedValue">5x</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Visualization area -->
+      <section class="visual-stage" aria-label="Visualization canvas">
+        <div class="stage-grid"></div>
+        <div class="stage-header">
+          <span class="stage-tag" id="stageTag">BUBBLE SORT</span>
+          <span class="stage-hint" id="stageHint">Array of 30 elements &middot; unsorted</span>
+        </div>
+        <div class="visual-canvas" id="visualCanvas">
+          <!-- bars / nodes injected by script.js -->
+        </div>
+        <div class="stage-legend" id="stageLegend">
+          <span><i class="dot dot-default"></i>Default</span>
+          <span><i class="dot dot-compare"></i>Comparing</span>
+          <span><i class="dot dot-sorted"></i>Sorted / Found</span>
+        </div>
+      </section>
+
+      <!-- Info panel -->
+      <section class="info-panel" aria-label="Algorithm information">
+        <div class="info-card info-description">
+          <h2>Algorithm Description</h2>
+          <p id="infoDescription">Loading description…</p>
+        </div>
+
+        <div class="info-card info-complexity">
+          <h2>Time Complexity</h2>
+          <div class="complexity-grid" id="timeComplexity">
+            <div class="complexity-chip">
+              <span class="chip-label">Best</span>
+              <span class="chip-value" data-value="best">O(n)</span>
+            </div>
+            <div class="complexity-chip">
+              <span class="chip-label">Average</span>
+              <span class="chip-value" data-value="average">O(n²)</span>
+            </div>
+            <div class="complexity-chip">
+              <span class="chip-label">Worst</span>
+              <span class="chip-value" data-value="worst">O(n²)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card info-space">
+          <h2>Space Complexity</h2>
+          <div class="complexity-chip chip-wide">
+            <span class="chip-label">Auxiliary</span>
+            <span class="chip-value" id="spaceComplexity">O(1)</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
