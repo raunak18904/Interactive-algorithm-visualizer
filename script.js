@@ -50,12 +50,54 @@ window.Vis = {
    2. ALGORITHM METADATA & DOM SETUP
 --------------------------------------------------------- */
 const ALGORITHMS = {
-  "bubble-sort": { tag: "BUBBLE SORT", type: "array" },
-  "merge-sort": { tag: "MERGE SORT", type: "array" },
-  "linear-search": { tag: "LINEAR SEARCH", type: "array" },
-  "binary-search": { tag: "BINARY SEARCH", type: "array" },
-  "bfs": { tag: "BFS", type: "graph" },
-  "dfs": { tag: "DFS", type: "graph" },
+  "bubble-sort": {
+    label: "Bubble Sort",
+    tag: "BUBBLE SORT",
+    type: "array",
+    description: "Repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order. Each full pass 'bubbles' the largest remaining value to its correct position at the end of the array.",
+    time: { best: "O(n)", average: "O(n²)", worst: "O(n²)" },
+    space: "O(1)",
+  },
+  "merge-sort": {
+    label: "Merge Sort",
+    tag: "MERGE SORT",
+    type: "array",
+    description: "A divide-and-conquer algorithm that recursively splits the array into halves, sorts each half, and merges the sorted halves back together to produce the final ordered sequence.",
+    time: { best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)" },
+    space: "O(n)",
+  },
+  "linear-search": {
+    label: "Linear Search",
+    tag: "LINEAR SEARCH",
+    type: "array",
+    description: "Scans the array from start to end, comparing each element against the target value until a match is found or the list is exhausted. Simple, but does not require the data to be sorted.",
+    time: { best: "O(1)", average: "O(n)", worst: "O(n)" },
+    space: "O(1)",
+  },
+  "binary-search": {
+    label: "Binary Search",
+    tag: "BINARY SEARCH",
+    type: "array",
+    description: "Repeatedly divides a sorted array in half, comparing the target to the middle element to decide which half to search next, drastically reducing the search space each step.",
+    time: { best: "O(1)", average: "O(log n)", worst: "O(log n)" },
+    space: "O(1)",
+  },
+  "bfs": {
+    label: "Breadth-First Search",
+    tag: "BFS",
+    type: "graph",
+    description: "Explores a graph level by level, visiting every neighbor of a node before moving to the next depth using a queue. Guarantees the shortest path in unweighted graphs.",
+    time: { best: "O(V + E)", average: "O(V + E)", worst: "O(V + E)" },
+    space: "O(V)",
+  },
+  "dfs": {
+    label: "Depth-First Search",
+    tag: "DFS",
+    type: "graph",
+    description: "Explores a graph by diving as deep as possible along each branch using a stack (or recursion) before backtracking, useful for detecting cycles and exploring connected components.",
+    time: { best: "O(V + E)", average: "O(V + E)", worst: "O(V + E)" },
+    space: "O(V)",
+  },
 };
 
 // Bind DOM Elements
@@ -74,6 +116,11 @@ window.Vis.els = {
   stageHint: document.getElementById("stageHint"),
   statusDot: document.getElementById("statusDot"),
   statusLabel: document.getElementById("statusLabel"),
+  
+  // Info Panel Elements
+  infoDescription: document.getElementById("infoDescription"),
+  timeComplexity: document.getElementById("timeComplexity"),
+  spaceComplexity: document.getElementById("spaceComplexity"),
 };
 
 const { state, els, setStatus, toggleControls } = window.Vis;
@@ -89,6 +136,30 @@ function updateStageMeta(key) {
   } else {
     const count = state.dataset.length || 0;
     els.stageHint.textContent = count ? `Array of ${count} elements · unsorted` : "No dataset yet";
+  }
+}
+
+function updateInfoPanel(key) {
+  const algo = ALGORITHMS[key];
+  
+  // Update description
+  if (els.infoDescription) {
+    els.infoDescription.textContent = algo.description;
+  }
+
+  // Update Time Complexity
+  if (els.timeComplexity) {
+    const chips = els.timeComplexity.querySelectorAll(".chip-value");
+    if (chips.length >= 3) {
+      chips[0].textContent = algo.time.best;
+      chips[1].textContent = algo.time.average;
+      chips[2].textContent = algo.time.worst;
+    }
+  }
+
+  // Update Space Complexity
+  if (els.spaceComplexity) {
+    els.spaceComplexity.textContent = algo.space;
   }
 }
 
@@ -109,6 +180,9 @@ els.algoButtons.forEach((btn) => {
     const key = btn.dataset.algo;
     state.currentAlgo = key;
     els.algoButtons.forEach(b => b.classList.toggle("active", b.dataset.algo === key));
+    
+    // Update the UI
+    updateInfoPanel(key);
     updateStageMeta(key);
     closeSidebar();
     setStatus("idle");
@@ -126,6 +200,7 @@ els.speedSlider.addEventListener("input", (e) => {
 --------------------------------------------------------- */
 function renderBars() {
   els.visualCanvas.innerHTML = "";
+  els.visualCanvas.style.position = ""; // Reset from absolute positioning if coming from graph
   els.visualCanvas.classList.toggle("empty", state.dataset.length === 0);
   const max = Math.max(...state.dataset, 1);
 
@@ -141,7 +216,12 @@ function renderBars() {
 els.generateBtn.addEventListener("click", () => {
   if (state.isRunning) return;
   state.dataset = Array.from({ length: 30 }, () => Math.floor(Math.random() * 90) + 10);
-  renderBars();
+  
+  // If we are looking at an array algorithm, render the bars immediately
+  if (ALGORITHMS[state.currentAlgo].type === 'array') {
+    renderBars();
+  }
+  
   updateStageMeta(state.currentAlgo);
   setStatus("idle");
 });
@@ -161,7 +241,11 @@ els.resetBtn.addEventListener("click", () => {
 // The Start Button routing
 els.startBtn.addEventListener("click", () => {
   if (state.isRunning) return;
-  if (state.dataset.length === 0) els.generateBtn.click();
+  
+  // Safety check: ensure array has data before running an array algorithm
+  if (state.dataset.length === 0 && ALGORITHMS[state.currentAlgo].type === 'array') {
+    els.generateBtn.click();
+  }
 
   document.querySelectorAll(".bar").forEach(bar => bar.classList.remove("compare", "sorted"));
 
@@ -172,11 +256,21 @@ els.startBtn.addEventListener("click", () => {
     algorithmRunner(); 
   } else {
     console.warn(`Algorithm ${state.currentAlgo} is not implemented yet!`);
-    // Optional: You could run a placeholder animation here if you want
   }
 });
 
-// Init
-els.speedValue.textContent = `${state.speed}x`;
-updateStageMeta(state.currentAlgo);
-els.generateBtn.click();
+/* ---------------------------------------------------------
+   5. INIT
+--------------------------------------------------------- */
+function init() {
+  els.speedValue.textContent = `${state.speed}x`;
+  updateInfoPanel(state.currentAlgo);
+  updateStageMeta(state.currentAlgo);
+  
+  // Auto-generate initial dataset if we are on an array view
+  if (ALGORITHMS[state.currentAlgo].type === 'array') {
+    els.generateBtn.click();
+  }
+}
+
+init();
